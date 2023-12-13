@@ -10,4 +10,6 @@ interface IOneAidlInterface {
      */
      String sendName();
      void checkBack(int response);
+     int sendNumber();
+     void checkEvenOddCallBack(int eo);
 }

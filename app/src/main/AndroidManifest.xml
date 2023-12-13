@@ -9,6 +9,8 @@
 
     <queries>
         <package android:name="com.anxer.part1" />
+        <package android:name="com.anxer.part3" />
+        <package android:name="com.anxer.part4"/>
     </queries>
 
     <application
