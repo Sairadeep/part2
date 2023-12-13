@@ -14,6 +14,8 @@ class MyPart2Service : Service() {
     private var aidlInterface: IOneAidlInterface? = null
     private lateinit var periodicRunnable: Runnable
     private var handler = Handler(Looper.getMainLooper())
+    private var isPart3ServiceRunning = false
+    private var isPart4ServiceRunning = false
 
     override fun onCreate() {
         periodicRunnable = object : Runnable {
@@ -29,10 +31,14 @@ class MyPart2Service : Service() {
         Log.d("part2Service", "Part2 service is started from Part1, starting Part3,Part4 now")
         val part3ServiceStart = Intent("MyPart3Service")
         part3ServiceStart.setPackage("com.anxer.part3")
-        startService(part3ServiceStart)
         val part4SerStart = Intent("MyPart4Service")
         part4SerStart.setPackage("com.anxer.part4")
-        startService(part4SerStart)
+        isPart3ServiceRunning = IsServiceOn.isServiceRunning(this, part3ServiceStart::class.java)
+        isPart4ServiceRunning = IsServiceOn.isServiceRunning(this, part4SerStart::class.java)
+        if (!isPart3ServiceRunning && !isPart4ServiceRunning) {
+            startService(part3ServiceStart)
+            startService(part4SerStart)
+        } else Log.d("part2Service", "Requested services are already running.")
         handler.post(periodicRunnable)
         return super.onStartCommand(intent, flags, startId)
     }
