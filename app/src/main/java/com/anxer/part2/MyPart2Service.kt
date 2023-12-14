@@ -28,7 +28,6 @@ class MyPart2Service : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("part2Service", "Part2 service is started from Part1, starting Part3,Part4 now")
         val part3ServiceStart = Intent("MyPart3Service")
         part3ServiceStart.setPackage("com.anxer.part3")
         val part4SerStart = Intent("MyPart4Service")
@@ -38,7 +37,7 @@ class MyPart2Service : Service() {
         if (!isPart3ServiceRunning && !isPart4ServiceRunning) {
             startService(part3ServiceStart)
             startService(part4SerStart)
-        } else Log.d("part2Service", "Requested services are already running.")
+        } else Log.d(StringData.tagName, StringData.serviceRunMessage)
         handler.post(periodicRunnable)
         return super.onStartCommand(intent, flags, startId)
     }
@@ -56,10 +55,8 @@ class MyPart2Service : Service() {
             return
         }
         val nameReceived = aidlInterface?.sendName()
-        Log.d("part2Service", "Received name from part1 : $nameReceived")
         if (nameReceived != "Default") Part1Data.setPart1Name(nameReceived.toString())
         val eoReceived = aidlInterface?.sendNumber()
-        Log.d("part2Service", "Hi  ${eoReceived.toString()}")
         if (eoReceived != null && eoReceived != 2) ReceivedNoFromPart1.setPart1EO(eoReceived.toInt())
         if (ResponseCallBack.getResponseCallBack() == 1) aidlInterface?.checkBack(1) else aidlInterface?.checkBack(
             0
@@ -71,13 +68,11 @@ class MyPart2Service : Service() {
 
     private val part1Connect = object : ServiceConnection {
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            Log.d("part2ServiceConnectionStatus", "Service is connected.")
             aidlInterface = IOneAidlInterface.Stub.asInterface(p1)
             checkConnection()
         }
 
         override fun onServiceDisconnected(p0: ComponentName?) {
-            Log.d("part2ServiceConnectionStatus", "Service is disconnected.")
             unbindService(this)
         }
     }
@@ -88,25 +83,18 @@ class MyPart2Service : Service() {
 
     private var binder = object : ITwoAidlInterface.Stub() {
         override fun sendNameTo3(): String {
-            Log.d("part2ServiceSent", "Sending from part2 to part3: ${Part1Data.getPart1Name()}")
             return Part1Data.getPart1Name()
         }
 
         override fun callBack(response: Int) {
-            Log.d("part2Service", "ResponseCallBack: $response")
             ResponseCallBack.setResponseCallBack(response)
         }
 
         override fun sendEO(): Int {
-            Log.d(
-                "part2ServiceSent",
-                "Sending from part2 to part: ${ReceivedNoFromPart1.getPart1EO()}"
-            )
             return ReceivedNoFromPart1.getPart1EO()
         }
 
         override fun callBackOfEO(resCall: Int) {
-            Log.d("part2Service", "ResponseCallEO: $resCall")
             ResponseCallForEO.setResponseCallBackEO(resCall)
         }
     }

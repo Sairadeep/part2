@@ -61,5 +61,10 @@ object IsServiceOn {
     }
 }
 
+object StringData{
+    var tagName : String = "part2Service"
+    var serviceRunMessage: String = "Services are already running."
+}
+
 
 
